@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  dev:
+    container_name: MONAI-dev
+    hostname: MONAI-dev
+    build:
+      context: ${PWD}
+      dockerfile: Dockerfile
+    tty: true
+    stdin_open: true
+    shm_size: 1gb
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            capabilities: [gpu]
+            count: all
+    volumes:
+      - ${PWD}:/workspace
+
+  glances:
+    container_name: MONAI-Glances
+    hostname: MONAI-Glances
+    image: nicolargo/glances:3.2.7-full
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            capabilities: [gpu]
+            count: all
+    environment:
+      - TZ=Asia/Seouls
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
+    pid: host
